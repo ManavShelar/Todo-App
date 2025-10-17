@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 
-const app = express();
+const app = express();  
 dotenv.config();
 
 const PORT = process.env.PORT;
@@ -31,7 +31,7 @@ app.use("/api/todo", todoRoute);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.get("/*splat", (req, res) => {
+  app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
