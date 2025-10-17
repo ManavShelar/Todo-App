@@ -24,6 +24,7 @@ export const getTodos = async (req, res) => {
   try {
     const todos = await Todo.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.status(200).json(todos);
+    
   } catch (error) {
     res.status(500).json({ message: "Error fetching todos", error });
   }
@@ -42,6 +43,24 @@ export const updateTodo = async (req, res) => {
     res.status(500).json({ message: "Error updating todo", error });
   }
 };
+
+export const taskDone = async (req, res) => {
+  try {
+    const { taskdone } = req.body
+    const taskUpdated = await Todo.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      { taskdone },
+      { new: true }
+    );
+    if (!taskUpdated) {
+      return res.status(404).json({ message: "Todo not found" });
+    }
+    res.status(200).json(taskUpdated);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating todo", error });
+  }
+};
+
 
 export const deleteTodo = async (req, res) => {
   try {
