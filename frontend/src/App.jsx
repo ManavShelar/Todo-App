@@ -1,6 +1,7 @@
 import './App.css'
 import Login from './pages/Login.jsx'
 import SignUp from './pages/SignUp.jsx'
+import Homepage from './pages/Homepage.jsx';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
@@ -24,7 +25,7 @@ const App = () => {
   return(
     <>
       <Routes>
-        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/" element={authUser ? <Homepage /> : <Navigate to="/login" />} />
         <Route path="/signup" element={!authUser ? <SignUp /> : <Navigate to="/" />} />
         <Route path="/login" element={!authUser ? <Login /> : <Navigate to="/" />} />
       </Routes>

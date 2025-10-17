@@ -19,6 +19,7 @@ export const useAuthStore = create((set, get) => ({
     }finally{
       set({ isCheckingAuth: false })
     }
+    
   },
 
   signUp: async (data) => {
@@ -49,7 +50,7 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async() => {
     try {
-      await axiosInstance.get("/auth/logout")
+      await axiosInstance.post("/auth/logout")
       set({ authUser: null })
       toast.success("Logged out successfully");
     } catch (error) {
