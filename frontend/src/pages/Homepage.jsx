@@ -1,42 +1,36 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import AddTodo from "../components/AddTodo.jsx";
 import { NotebookPen, Pencil, Trash } from "lucide-react";
-import axios from "axios";
+import { axiosInstance } from "../lib/axios";
 
 const Homepage = () => {
+  const [todos, setTodos] = useState([]);
+  const [name, setName] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editTodo, setEditTodo] = useState(null);
+
   useEffect(() => {
     const fetchTodos = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/todo", {
-          withCredentials: true,
-        });
+        const res = await axiosInstance.get("/todo");
         setTodos(res.data || []);
-        
-        const user = await axios.get("http://localhost:5001/api/auth/check", {
-          withCredentials: true,
-        });
-        setName(user.data);
+
+        const userRes = await axiosInstance.get("/auth/check");
+        setName(userRes.data);
       } catch (error) {
         console.error("Error fetching todos:", error);
       }
     };
+
     fetchTodos();
   }, []);
 
-  const [todos, setTodos] = useState([]);
-  const [name, setName] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);  
-  const [editTodo, setEditTodo] = useState(null);
-
   const handleCheckboxChange = async (id, currentValue) => {
     try {
-      const res = await axios.put(
-        `http://localhost:5001/api/todo/${id}/task-done`,
-        { taskdone: !currentValue },
-        { withCredentials: true }
-      );
+      await axiosInstance.put(`/todo/${id}/task-done`, {
+        taskdone: !currentValue,
+      });
       setTodos((prev) =>
         prev.map((todo) =>
           todo._id === id ? { ...todo, taskdone: !currentValue } : todo
@@ -45,26 +39,23 @@ const Homepage = () => {
     } catch (error) {
       console.error("Error updating taskdone:", error);
     }
-  };  
+  };
 
   const handleAddOrUpdateTodo = async (title, description) => {
     try {
       if (title.trim() && description.trim()) {
         if (editTodo) {
-          const res = await axios.put(
-            `http://localhost:5001/api/todo/${editTodo._id}`,
-            { title, description },
-            { withCredentials: true }
+          const res = await axiosInstance.put(`/todo/${editTodo._id}`, {
+            title,
+            description,
+          });
+          setTodos((prev) =>
+            prev.map((t) => (t._id === editTodo._id ? res.data : t))
           );
-          setTodos(todos.map((t) => (t._id === editTodo._id ? res.data : t)));
           setEditTodo(null);
         } else {
-          const res = await axios.post(
-            "http://localhost:5001/api/todo",
-            { title, description },
-            { withCredentials: true }
-          );
-          setTodos([...todos, res.data]);
+          const res = await axiosInstance.post("/todo", { title, description });
+          setTodos((prev) => [...prev, res.data]);
         }
       }
     } catch (error) {
@@ -74,18 +65,18 @@ const Homepage = () => {
 
   const handleDeleteTodo = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/todo/${id}`, {
-        withCredentials: true,
-      });
-      setTodos(todos.filter((todo) => todo._id !== id));
+      await axiosInstance.delete(`/todo/${id}`);
+      setTodos((prev) => prev.filter((todo) => todo._id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
     }
   };
+
   const handleEditTodo = (todo) => {
     setEditTodo(todo);
     setIsModalOpen(true);
   };
+
   return (
     <>
       <Navbar />
@@ -93,7 +84,9 @@ const Homepage = () => {
       {todos.length === 0 ? (
         <div className="flex items-center justify-center w-full h-[calc(100vh-80px)]">
           <h1 className="text-center text-black text-2xl">
-            {`Hello ${name.username} looks like you haven't added any todos yet. Click the Button to add.`}
+            {`Hello ${
+              name.username || "User"
+            }, looks like you haven't added any todos yet. Click the Button to add.`}
           </h1>
         </div>
       ) : (
@@ -110,20 +103,23 @@ const Homepage = () => {
                     {todo.description}
                   </p>
                 </div>
+
                 <div>
                   <label
                     className="relative flex cursor-pointer items-center rounded-full p-3"
-                    htmlFor="ripple-on"
-                    data-ripple-dark="true"
+                    htmlFor={`checkbox-${todo._id}`}
                   >
                     <input
-                      id="ripple-on"
+                      id={`checkbox-${todo._id}`}
                       type="checkbox"
                       checked={todo.taskdone || false}
                       onChange={() =>
                         handleCheckboxChange(todo._id, todo.taskdone)
                       }
-                      className="peer relative h-5 w-5 bg-white cursor-pointer appearance-none rounded border border-slate-300 shadow hover:shadow-md transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-slate-400 before:opacity-0 before:transition-opacity checked:border-slate-800 checked:bg-white checked:before:bg-slate-400 hover:before:opacity-10"
+                      className="peer relative h-5 w-5 bg-white cursor-pointer appearance-none rounded border border-slate-300 shadow hover:shadow-md transition-all
+                      before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 
+                      before:rounded-full before:bg-slate-400 before:opacity-0 before:transition-opacity 
+                      checked:border-slate-800 checked:bg-white checked:before:bg-slate-400 hover:before:opacity-10"
                     />
                     <span className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-black opacity-0 transition-opacity peer-checked:opacity-100">
                       <svg
@@ -144,16 +140,16 @@ const Homepage = () => {
                   </label>
                 </div>
               </div>
+
               <div className="flex justify-between mt-4 text-sm">
-                <div>
-                  <button
-                    className="text-yellow-400 flex items-center cursor-pointer"
-                    onClick={() => handleEditTodo(todo)}
-                  >
-                    <span className="text-xl m-2">Edit</span>
-                    <Pencil className="transition-transform duration-200 hover:translate-x-1 hover:-translate-y-0.5" />
-                  </button>
-                </div>
+                <button
+                  className="text-yellow-400 flex items-center cursor-pointer"
+                  onClick={() => handleEditTodo(todo)}
+                >
+                  <span className="text-xl m-2">Edit</span>
+                  <Pencil className="transition-transform duration-200 hover:translate-x-1 hover:-translate-y-0.5" />
+                </button>
+
                 <button
                   className="text-red-400 flex items-center cursor-pointer"
                   onClick={() => handleDeleteTodo(todo._id)}
