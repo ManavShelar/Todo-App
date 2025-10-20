@@ -32,8 +32,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="w-screen min-h-screen flex items-center justify-center bg-[#E5E5E5] p-4">
-      <div className="flex flex-col md:flex-row w-full max-w-[900px] bg-white rounded-lg overflow-hidden shadow-lg">
+    <div className="w-screen min-h-screen flex items-center justify-center bg-white p-4 md:bg-[#E5E5E5]">
+      <div className="flex flex-col md:flex-row w-full max-w-[900px] bg-white rounded-none md:rounded-l-lg overflow-hidden min-h-screen md:min-h-0 py-[100px] md:py-[0px]">
         <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
           <h1 className="text-3xl font-bold mb-2">Create An Account</h1>
           <p className="text-sm mb-6">

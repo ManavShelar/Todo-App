@@ -14,13 +14,13 @@ const Login = () => {
   };
 
   return (
-    <div className="w-screen min-h-screen flex items-center justify-center bg-[#E5E5E5] p-4">
-      <div className="flex flex-col md:flex-row w-full max-w-[900px] bg-white rounded-lg overflow-hidden shadow-lg">
-        <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
+    <div className="w-screen min-h-screen flex items-center justify-center bg-[#E5E5E5] md:bg-[#E5E5E5]">
+      <div className="flex flex-col md:flex-row w-full md:max-w-[900px] bg-white rounded-none md:rounded-lg overflow-hidden shadow-lg min-h-screen md:min-h-0 py-[100px] md:py-[0px]">
+        <div className="w-full md:w-1/2 p-6 h-[600px] md:p-10 flex flex-col justify-center md:h-screen ">
           <h1 className="text-3xl font-bold mb-2">Login</h1>
           <p className="text-sm mb-6">
             Don't Have An Account?{" "}
-            <Link className="text-blue-500" to="/signup">
+            <Link className="text-blue-500" to="/signup"> 
               SignUp
             </Link>
           </p>
@@ -52,12 +52,13 @@ const Login = () => {
               />
               <button
                 type="button"
-                className="absolute right-3 bottom-2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-black"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-black"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+
             <div className="flex items-start gap-2 text-sm">
               <input type="checkbox" className="cursor-pointer mt-1" />
               <p>
@@ -65,6 +66,7 @@ const Login = () => {
                 events, and promotions.
               </p>
             </div>
+
             <button
               type="submit"
               disabled={isLoggingIn}
@@ -79,6 +81,7 @@ const Login = () => {
                 "Login"
               )}
             </button>
+
             <p className="text-xs text-center mt-2">
               Don't have an account?{" "}
               <Link className="text-blue-500" to="/signup">
